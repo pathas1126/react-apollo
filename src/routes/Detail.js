@@ -5,7 +5,7 @@ import { useQuery } from "@apollo/react-hooks";
 import styled from "styled-components";
 
 const GET_MOVIE = gql`
-  query getMovsdsdsdie($id: Int!) {
+  query getMovie($id: Int!) {
     movie(id: $id) {
       id
       title_long
@@ -13,6 +13,10 @@ const GET_MOVIE = gql`
       language
       rating
       description_full
+    }
+    suggestions(id: $id) {
+      id
+      medium_cover_image
     }
   }
 `;
@@ -59,24 +63,17 @@ export default () => {
   const { loading, data } = useQuery(GET_MOVIE, {
     variables: { id: Number(id) },
   });
+  console.log(data);
   return (
     <Container>
       <Column>
         <Title>{loading ? "Loading...." : data.movie.title_long}</Title>
-        {!loading && data.movie && (
-          <>
-            <Subtitle>
-              {data.movie.language} - {data.movie.rating}
-            </Subtitle>
-            <Description>{data.movie.description_full}</Description>
-          </>
-        )}
+        <Subtitle>
+          {data?.movie?.language} - 🌟{data?.movie?.rating}
+        </Subtitle>
+        <Description>{data?.movie?.description_full}</Description>
       </Column>
-      {!loading && (
-        <Poster
-          bg={data && data.movie && data.movie.medium_cover_image}
-        ></Poster>
-      )}
+      <Poster bg={data?.movie?.medium_cover_image}></Poster>
     </Container>
   );
 };
