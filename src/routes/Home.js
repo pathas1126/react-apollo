@@ -4,6 +4,16 @@ import { useQuery } from "@apollo/react-hooks";
 import styled from "styled-components";
 import Movie from "../components/Movie";
 
+const GET_MOVIES = gql`
+  query {
+    movies(sort: "rating") {
+      id
+      medium_cover_image
+      isLiked @client
+    }
+  }
+`;
+
 const Container = styled.div`
   width: 100%;
   display: flex;
@@ -40,15 +50,6 @@ const Loading = styled.div`
   color: rgba(0, 0, 0, 0.6);
 `;
 
-const GET_MOVIES = gql`
-  query {
-    movies(sort: "rating") {
-      id
-      medium_cover_image
-    }
-  }
-`;
-
 const Movies = styled.div`
   width: 70%;
   position: relative;
@@ -69,7 +70,12 @@ export default () => {
       {loading && <Loading>Loading...</Loading>}
       <Movies>
         {data?.movies?.map((movie) => (
-          <Movie key={movie.id} id={movie.id} bg={movie.medium_cover_image} />
+          <Movie
+            key={movie.id}
+            id={movie.id}
+            bg={movie.medium_cover_image}
+            isLiked={movie.isLiked}
+          />
         ))}
       </Movies>
     </Container>
