@@ -1,8 +1,9 @@
 import React from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { gql } from "apollo-boost";
 import { useQuery } from "@apollo/react-hooks";
 import styled from "styled-components";
+import Movie from "../components/Movie";
 
 const GET_MOVIE = gql`
   query getMovie($id: Int!) {
@@ -22,13 +23,21 @@ const GET_MOVIE = gql`
 `;
 
 const Container = styled.div`
-  height: 100vh;
+  min-height: 100vh;
   width: 100%;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
   color: white;
   background: linear-gradient(150deg, #ee5253, #f368e0);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
+const Article = styled.div`
+  width: 100%;
+  min-height: 50rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
 `;
 
 const Column = styled.div`
@@ -51,11 +60,35 @@ const Description = styled.p`
 `;
 
 const Poster = styled.div`
-  width: 30%;
-  height: 70%;
+  width: 400px;
+  height: 550px;
   background-image: url(${(props) => props.bg});
   background-size: cover;
   background-position: center center;
+  border-radius: 10px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+`;
+
+const SuggestionsWrapper = styled.section`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
+const SuggestionsTitle = styled.h1`
+  width: 100%;
+  text-align: center;
+  font-weight: 600;
+  font-size: 2rem;
+`;
+
+const Suggestions = styled.div`
+  margin: 2rem auto;
+  width: 80%;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-gap: 35px;
 `;
 
 export default () => {
@@ -66,14 +99,32 @@ export default () => {
   console.log(data);
   return (
     <Container>
-      <Column>
-        <Title>{loading ? "Loading...." : data.movie.title_long}</Title>
-        <Subtitle>
-          {data?.movie?.language} - 🌟{data?.movie?.rating}
-        </Subtitle>
-        <Description>{data?.movie?.description_full}</Description>
-      </Column>
-      <Poster bg={data?.movie?.medium_cover_image}></Poster>
+      <Article>
+        <Column>
+          <Title>{loading ? "Loading...." : data.movie.title_long}</Title>
+          <Subtitle>
+            {data?.movie?.language} - 🌟{data?.movie?.rating}
+          </Subtitle>
+          <Description>{data?.movie?.description_full}</Description>
+        </Column>
+        {!loading && <Poster bg={data?.movie?.medium_cover_image}></Poster>}
+      </Article>
+      <SuggestionsWrapper>
+        {!loading && (
+          <>
+            <SuggestionsTitle>Suggestions</SuggestionsTitle>
+            <Suggestions>
+              {data?.suggestions?.map((suggestion) => (
+                <Movie
+                  key={suggestion.id}
+                  id={suggestion.id}
+                  bg={suggestion.medium_cover_image}
+                />
+              ))}
+            </Suggestions>
+          </>
+        )}
+      </SuggestionsWrapper>
     </Container>
   );
 };
