@@ -1,5 +1,5 @@
 import React from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { gql } from "apollo-boost";
 import { useQuery } from "@apollo/react-hooks";
 import styled from "styled-components";
@@ -9,11 +9,12 @@ const GET_MOVIE = gql`
   query getMovie($id: Int!) {
     movie(id: $id) {
       id
-      title_long
+      title
       medium_cover_image
       language
       rating
       description_full
+      isLiked @client
     }
     suggestions(id: $id) {
       id
@@ -91,17 +92,20 @@ const Suggestions = styled.div`
   grid-gap: 35px;
 `;
 
-export default () => {
+export default (props) => {
   const { id } = useParams();
   const { loading, data } = useQuery(GET_MOVIE, {
-    variables: { id: Number(id) },
+    variables: { id: parseInt(id) },
   });
-  console.log(data);
   return (
     <Container>
       <Article>
         <Column>
-          <Title>{loading ? "Loading...." : data.movie.title_long}</Title>
+          <Title>
+            {loading
+              ? "Loading...."
+              : `${data.movie.title} ${data.movie.isLiked ? "♥" : "♡"}`}
+          </Title>
           <Subtitle>
             {data?.movie?.language} - 🌟{data?.movie?.rating}
           </Subtitle>

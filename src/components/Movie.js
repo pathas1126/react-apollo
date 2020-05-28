@@ -4,9 +4,9 @@ import styled from "styled-components";
 import { gql } from "apollo-boost";
 import { useMutation } from "@apollo/react-hooks";
 
-const LIKE_MOVIE = gql`
-  mutation LikeMovie($id: Int!) {
-    likeMovie(id: $id) @client
+const TOGGLE_LIKE_MOVIE = gql`
+  mutation ToggleLikeMovie($id: Int!, $isLiked: Boolean!) {
+    toggleLikeMovie(id: $id, isLiked: $isLiked) @client
   }
 `;
 
@@ -27,18 +27,25 @@ const Poster = styled.div`
 `;
 
 export default ({ id, bg, isLiked }) => {
-  const [likeMovie] = useMutation(LIKE_MOVIE, {
-    variables: { id: parseInt(id) },
+  const [toggleLikeMovie] = useMutation(TOGGLE_LIKE_MOVIE, {
+    variables: { id: parseInt(id), isLiked },
   });
 
   return (
     <Container>
-      <Link to={`/${id}`}>
+      <Link
+        to={{
+          pathname: `/${id}`,
+          state: {
+            isLiked,
+          },
+        }}
+      >
         <Poster bg={bg} />
       </Link>
       <span
         style={{ color: "red", cursor: "pointer" }}
-        onClick={isLiked ? null : likeMovie}
+        onClick={toggleLikeMovie}
       >
         {isLiked ? "♥" : "♡"}
       </span>
